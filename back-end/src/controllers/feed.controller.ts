@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { validationResult } from "express-validator";
 
 export const getPosts = (req: Request, res: Response, next: NextFunction) => {
   return res.json({
@@ -19,6 +20,15 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
 
 export const createPost = (req: Request, res: Response, next: NextFunction) => {
   const { title, content } = req.body;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Validation failed, entered data is incorrect.",
+      errors: errors.array(),
+    });
+  }
+
   res.status(201).json({
     message: "Post created successfully!",
     post: {
