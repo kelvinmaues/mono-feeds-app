@@ -21,20 +21,12 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
 
 export const createPost = (req: Request, res: Response, next: NextFunction) => {
   const { title, content } = req.body;
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Validation failed, entered data is incorrect.",
-      errors: errors.array(),
-    });
-  }
 
   const post = new Post({
     title,
     content,
     creator: { name: "Kelvin " },
-    imageUrl: 'images/stand.png'
+    imageUrl: "images/stand.png",
   });
   post
     .save()
@@ -43,5 +35,10 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
         .status(201)
         .json({ message: "Post created successfully", post: result });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      if (!(err.statusCode === 500)) {
+        err.statusCode === 500;
+      }
+      next(err);
+    });
 };
