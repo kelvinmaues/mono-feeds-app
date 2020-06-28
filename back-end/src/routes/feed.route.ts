@@ -14,4 +14,6 @@ router.post(
   feedController.createPost
 );
 
+router.get("/posts/:postId", feedController.getPost);
+
 export default router;

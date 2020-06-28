@@ -13,11 +13,7 @@ export const errorHandler = (
     error.message || "It's not you. It's us. We are having some problems.";
   const errors = error.errors;
 
-  if (errors && status !== 500) {
-    response.status(status).json({ errors });
-  } else {
-    response.status(status).json({ message });
-  }
+  response.status(status).json(errors ? { errors } : { message });
 };
 
 export const errorValidator = (
