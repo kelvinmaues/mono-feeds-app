@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import MobileToggle from '../MobileToggle/MobileToggle';
-import Logo from '../../Logo/Logo';
-import NavigationItems from '../NavigationItems/NavigationItems';
+import MobileToggle from '../MobileToggle';
+import Logo from '../../Logo';
+import NavigationItems from '../NavigationItems';
 
 import './MainNavigation.css';
 
