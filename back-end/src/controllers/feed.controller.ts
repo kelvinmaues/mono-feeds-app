@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
+import { Post } from "../models/post.model";
 
 export const getPosts = (req: Request, res: Response, next: NextFunction) => {
   return res.json({
@@ -29,14 +30,18 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  res.status(201).json({
-    message: "Post created successfully!",
-    post: {
-      id: new Date().toISOString(),
-      title,
-      content,
-      creator: { name: "Kelvin" },
-      createdAt: new Date(),
-    },
+  const post = new Post({
+    title,
+    content,
+    creator: { name: "Kelvin " },
+    imageUrl: 'images/stand.png'
   });
+  post
+    .save()
+    .then((result) => {
+      res
+        .status(201)
+        .json({ message: "Post created successfully", post: result });
+    })
+    .catch((err) => console.log(err));
 };
