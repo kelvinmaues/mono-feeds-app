@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { User } from "../models/user.model";
+import jwt from "jsonwebtoken";
+import { User, UserDocument } from "../models/user.model";
 import catchError from "../common/catch-error";
 import HttpException from "../common/http-exception";
 
-export const signUp = (req: Request, res: Response, next: NextFunction) => {
+export const signup = (req: Request, res: Response, next: NextFunction) => {
   const { email, password, name } = req.body;
 
   bcrypt
@@ -25,7 +26,7 @@ export const signUp = (req: Request, res: Response, next: NextFunction) => {
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  let loadedUser;
+  let loadedUser: UserDocument;
 
   User.findOne({ email })
     .then((user) => {
@@ -41,6 +42,19 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         const error = new HttpException(401, "Invalid password!");
         throw error;
       }
+      const token = jwt.sign(
+        {
+          email: loadedUser.email,
+          userId: loadedUser._id.toString(),
+        },
+        "Th3d@rks1d3",
+        {
+          expiresIn: "1h",
+        }
+      );
+      res
+        .status(200)
+        .json({ token, userId: loadedUser._id.toString(), user: loadedUser });
     })
     .catch((err) => catchError(err, next));
 };
