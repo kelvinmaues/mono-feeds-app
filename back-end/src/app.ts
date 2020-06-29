@@ -19,7 +19,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(multerFileStorage);
-console.log(path.join(__dirname, 'images'))
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // app.use((req: Request, res: Response, next: NextFunction) => {

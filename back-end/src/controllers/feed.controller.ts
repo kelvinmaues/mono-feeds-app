@@ -19,35 +19,31 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
 export const createPost = (req: Request, res: Response, next: NextFunction) => {
   const { title, content } = req.body;
 
-  // if (!req.file) {
-  //   const error = new Error("No image provided.") as HttpException;
-  //   error.statusCode = 422;
-  //   throw error;
-  // }
-  // const imageUrl = req.file.path;
+  if (!req.file) {
+    const error = new Error("No image provided.") as HttpException;
+    error.statusCode = 422;
+    throw error;
+  }
+  const imageUrl = req.file.path;
 
-  console.log(req.file);
-
-  res.status(201).json({ success: true });
-
-  // const post = new Post({
-  //   title,
-  //   content,
-  //   creator: { name: "Kelvin " },
-  //   imageUrl,
-  // });
-  // post
-  //   .save()
-  //   .then((result) => {
-  //     res.status(201).json({ post: result });
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     if (!(err.statusCode === 500)) {
-  //       err.statusCode === 500;
-  //     }
-  //     next(err);
-  //   });
+  const post = new Post({
+    title,
+    content,
+    creator: { name: "Kelvin " },
+    imageUrl,
+  });
+  post
+    .save()
+    .then((result) => {
+      res.status(201).json({ post: result });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (!(err.statusCode === 500)) {
+        err.statusCode === 500;
+      }
+      next(err);
+    });
 };
 
 export const getPost = (req: Request, res: Response, next: NextFunction) => {

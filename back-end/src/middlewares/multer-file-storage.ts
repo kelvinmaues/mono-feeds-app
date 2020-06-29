@@ -7,10 +7,10 @@ const fileStorage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
-    cb(null, path.join(__dirname, '../images'));
+    cb(null, path.join(__dirname, "../images"));
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, `${new Date().toISOString()}-${file.originalname}`);
   },
 });
 
