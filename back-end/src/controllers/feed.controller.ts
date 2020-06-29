@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 // Model
 import { Post } from "../models/post.model";
+// common
 import HttpException from "../common/http-exception";
+import catchError from "../common/catch-error";
 // utils
 import clearImage from "../utils/clear-image";
 
@@ -25,12 +27,7 @@ export const getPosts = async (
     .then((posts) => {
       res.status(200).json({ posts, totalItems });
     })
-    .catch((err) => {
-      if (!(err.statusCode === 500)) {
-        err.statusCode === 500;
-      }
-      next(err);
-    });
+    .catch((err) => catchError(err, next));
 };
 
 export const createPost = (req: Request, res: Response, next: NextFunction) => {
@@ -54,13 +51,7 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
     .then((result) => {
       res.status(201).json({ post: result });
     })
-    .catch((err) => {
-      console.log(err);
-      if (!(err.statusCode === 500)) {
-        err.statusCode === 500;
-      }
-      next(err);
-    });
+    .catch((err) => catchError(err, next));
 };
 
 export const getPost = (req: Request, res: Response, next: NextFunction) => {
@@ -74,12 +65,7 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
       }
       res.status(200).json({ post });
     })
-    .catch((err) => {
-      if (!(err.statusCode === 500)) {
-        err.statusCode === 500;
-      }
-      next(err);
-    });
+    .catch((err) => catchError(err, next));
 };
 
 export const updatePost = (req: Request, res: Response, next: NextFunction) => {
@@ -116,12 +102,7 @@ export const updatePost = (req: Request, res: Response, next: NextFunction) => {
     .then((postSaved) => {
       res.status(200).json({ post: postSaved });
     })
-    .catch((err) => {
-      if (!(err.statusCode === 500)) {
-        err.statusCode === 500;
-      }
-      next(err);
-    });
+    .catch((err) => catchError(err, next));
 };
 
 export const deletePost = (
@@ -143,13 +124,7 @@ export const deletePost = (
       return Post.findByIdAndRemove(postId);
     })
     .then((result) => {
-      console.log(result);
       resp.status(200).json({ success: true });
     })
-    .catch((err) => {
-      if (!(err.statusCode === 500)) {
-        err.statusCode === 500;
-      }
-      next(err);
-    });
+    .catch((err) => catchError(err, next));
 };
