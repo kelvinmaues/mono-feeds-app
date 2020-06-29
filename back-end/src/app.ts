@@ -8,6 +8,7 @@ import path from "path";
 // internal imports
 import { errorHandler } from "./middlewares/error";
 import feedRoutes from "./routes/feed.route";
+import authRoutes from "./routes/auth.route";
 import database from "./database/connection";
 import multerFileStorage from "./middlewares/multer-file-storage";
 
@@ -19,7 +20,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(multerFileStorage);
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // app.use((req: Request, res: Response, next: NextFunction) => {
 //   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -35,6 +36,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
  * Routes
  */
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 
 /**
  * Error Handler
