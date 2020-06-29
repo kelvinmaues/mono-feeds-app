@@ -5,10 +5,25 @@ import HttpException from "../common/http-exception";
 // utils
 import clearImage from "../utils/clear-image";
 
-export const getPosts = (req: Request, res: Response, next: NextFunction) => {
-  Post.find()
+export const getPosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const currentPage = Number(req.query.page) || 1;
+  const perPage = 2;
+  let totalItems: number;
+
+  await Post.find()
+    .countDocuments()
+    .then((count) => {
+      totalItems = count;
+      return Post.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    })
     .then((posts) => {
-      res.status(200).json({ posts });
+      res.status(200).json({ posts, totalItems });
     })
     .catch((err) => {
       if (!(err.statusCode === 500)) {
