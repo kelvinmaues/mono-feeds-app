@@ -7,7 +7,7 @@ import {
   Paginator,
   Loader,
   ErrorHandler,
-  Input
+  Input,
 } from "../../components";
 import "./Feed.css";
 
@@ -107,7 +107,12 @@ class Feed extends Component {
     this.setState({
       editLoading: true,
     });
-    // Set up data (with image!)
+
+    const formData = new FormData();
+    formData.append("title", postData.title);
+    formData.append("content", postData.content);
+    formData.append("image", postData.image);
+
     let url = "http://localhost:8080/feed/posts";
     let method = "POST";
     if (this.state.editPost) {
@@ -115,14 +120,8 @@ class Feed extends Component {
     }
 
     fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: postData.title,
-        content: postData.content,
-      }),
+      method: method,
+      body: formData,
     })
       .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
