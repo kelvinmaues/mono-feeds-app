@@ -108,3 +108,33 @@ export const updatePost = (req: Request, res: Response, next: NextFunction) => {
       next(err);
     });
 };
+
+export const deletePost = (
+  req: Request,
+  resp: Response,
+  next: NextFunction
+) => {
+  const { postId } = req.params;
+
+  Post.findById(postId)
+    .then((post) => {
+      // Check logged in user
+      if (!post) {
+        const error = new Error("Could not find a post") as HttpException;
+        error.statusCode = 404;
+        throw error;
+      }
+      clearImage(post.imageUrl);
+      return Post.findByIdAndRemove(postId);
+    })
+    .then((result) => {
+      console.log(result);
+      resp.status(200).json({ success: true });
+    })
+    .catch((err) => {
+      if (!(err.statusCode === 500)) {
+        err.statusCode === 500;
+      }
+      next(err);
+    });
+};
