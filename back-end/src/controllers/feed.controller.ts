@@ -137,7 +137,17 @@ export const deletePost = (
       clearImage(post.imageUrl);
       return Post.findByIdAndRemove(postId);
     })
-    .then((result) => {
+    .then(() => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      if (!user) {
+        throw new HttpException(401, "User not found!");
+      }
+      user.posts.pull(postId);
+      return user.save();
+    })
+    .then(() => {
       resp.status(200).json({ success: true });
     })
     .catch((err) => catchError(err, next));
