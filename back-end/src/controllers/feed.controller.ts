@@ -15,20 +15,16 @@ export const getPosts = async (
 ) => {
   const currentPage = Number(req.query.page) || 1;
   const perPage = 2;
-  let totalItems: number;
 
-  await Post.find()
-    .countDocuments()
-    .then((count) => {
-      totalItems = count;
-      return Post.find()
-        .skip((currentPage - 1) * perPage)
-        .limit(perPage);
-    })
-    .then((posts) => {
-      res.status(200).json({ posts, totalItems });
-    })
-    .catch((err) => catchError(err, next));
+  try {
+    const totalItems = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
+    res.status(200).json({ posts, totalItems });
+  } catch (err) {
+    catchError(err, next);
+  }
 };
 
 export const createPost = (req: Request, res: Response, next: NextFunction) => {
