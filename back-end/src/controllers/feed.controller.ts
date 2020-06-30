@@ -102,6 +102,9 @@ export const updatePost = (req: Request, res: Response, next: NextFunction) => {
         error.statusCode = 404;
         throw error;
       }
+      if (post.creator.toString() !== req.userId) {
+        throw new HttpException(403, "Not authorized");
+      }
       if (imageUrl !== post.imageUrl) {
         clearImage(post.imageUrl);
       }
@@ -125,11 +128,11 @@ export const deletePost = (
 
   Post.findById(postId)
     .then((post) => {
-      // Check logged in user
       if (!post) {
-        const error = new Error("Could not find a post") as HttpException;
-        error.statusCode = 404;
-        throw error;
+        throw new HttpException(404, "Could not find a post");
+      }
+      if (post.creator.toString() !== req.userId) {
+        throw new HttpException(403, "Not authorized");
       }
       clearImage(post.imageUrl);
       return Post.findByIdAndRemove(postId);
