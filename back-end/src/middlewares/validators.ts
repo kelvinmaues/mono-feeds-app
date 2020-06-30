@@ -21,3 +21,11 @@ export const signUp = [
   body("password").trim().isLength({ min: 5 }),
   body("name").trim().notEmpty(),
 ];
+
+export const login = [
+  body("email")
+    .isEmail()
+    .withMessage("Please enter a valid e-mail.")
+    .normalizeEmail(),
+  body("password").trim().notEmpty(),
+];

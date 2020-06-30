@@ -2,7 +2,7 @@
  * Required External Modules
  */
 import mongoose from "mongoose";
-import { TPost } from "../types/post.type";
+import { TPost } from "../@types/post.type";
 
 /**
  * Data Model Interfaces

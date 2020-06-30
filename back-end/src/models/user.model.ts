@@ -2,7 +2,7 @@
  * Required External Modules
  */
 import mongoose from "mongoose";
-import { TUser } from "../types/user.type";
+import { TUser } from "../@types/user.type";
 
 const Schema = mongoose.Schema;
 
