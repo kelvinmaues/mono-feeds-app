@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 // Model
-import { Post } from "../models/post.model";
+import { Post, PostDocument } from "../models/post.model";
+import { User, UserDocument } from "../models/user.model";
 // common
 import HttpException from "../common/http-exception";
 import catchError from "../common/catch-error";
@@ -39,17 +40,27 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
     throw error;
   }
   const imageUrl = req.file.path;
-
   const post = new Post({
     title,
     content,
-    creator: { name: "Kelvin " },
+    creator: req.userId,
     imageUrl,
   });
+
   post
     .save()
-    .then((result) => {
-      res.status(201).json({ post: result });
+    .then(() => {
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      if (!user) {
+        throw new HttpException(401, "User not found!");
+      }
+      user.posts.push(post);
+      return user.save();
+    })
+    .then(() => {
+      res.status(201).json({ post });
     })
     .catch((err) => catchError(err, next));
 };
