@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 // Model
-import { Post, PostDocument } from "../models/post.model";
-import { User, UserDocument } from "../models/user.model";
+import { Post } from "../models/post.model";
+import { User } from "../models/user.model";
 // common
 import HttpException from "../common/http-exception";
 import catchError from "../common/catch-error";
@@ -27,7 +27,11 @@ export const getPosts = async (
   }
 };
 
-export const createPost = (req: Request, res: Response, next: NextFunction) => {
+export const createPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { title, content } = req.body;
 
   if (!req.file) {
@@ -43,39 +47,45 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
     imageUrl,
   });
 
-  post
-    .save()
-    .then(() => {
-      return User.findById(req.userId);
-    })
-    .then((user) => {
-      if (!user) {
-        throw new HttpException(401, "User not found!");
-      }
-      user.posts.push(post);
-      return user.save();
-    })
-    .then(() => {
-      res.status(201).json({ post });
-    })
-    .catch((err) => catchError(err, next));
+  try {
+    await post.save();
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new HttpException(401, "User not found!");
+    }
+    user.posts.push(post);
+    await user.save();
+    res.status(201).json({ post });
+  } catch (err) {
+    catchError(err, next);
+  }
 };
 
-export const getPost = (req: Request, res: Response, next: NextFunction) => {
+export const getPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { postId } = req.params;
-  Post.findById(postId)
-    .then((post) => {
-      if (!post) {
-        const error = new Error("Could not find a post") as HttpException;
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json({ post });
-    })
-    .catch((err) => catchError(err, next));
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      const error = new Error("Could not find a post") as HttpException;
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json({ post });
+  } catch (err) {
+    catchError(err, next);
+  }
 };
 
-export const updatePost = (req: Request, res: Response, next: NextFunction) => {
+export const updatePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const {
     params: { postId },
     body: { title, content, image },
@@ -86,65 +96,54 @@ export const updatePost = (req: Request, res: Response, next: NextFunction) => {
     imageUrl = req.file.path;
   }
   if (!imageUrl) {
-    const error = new Error("No file picked") as HttpException;
-    error.statusCode = 422;
-    throw error;
+    throw new HttpException(422, "No file picked");
   }
 
-  Post.findById(postId)
-    .then((post) => {
-      if (!post) {
-        const error = new Error("Could not find a post") as HttpException;
-        error.statusCode = 404;
-        throw error;
-      }
-      if (post.creator.toString() !== req.userId) {
-        throw new HttpException(403, "Not authorized");
-      }
-      if (imageUrl !== post.imageUrl) {
-        clearImage(post.imageUrl);
-      }
-      post.title = title;
-      post.imageUrl = imageUrl;
-      post.content = content;
-      return post.save();
-    })
-    .then((postSaved) => {
-      res.status(200).json({ post: postSaved });
-    })
-    .catch((err) => catchError(err, next));
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      throw new HttpException(404, "Could not find a post");
+    }
+    if (post.creator.toString() !== req.userId) {
+      throw new HttpException(403, "Not authorized");
+    }
+    if (imageUrl !== post.imageUrl) {
+      clearImage(post.imageUrl);
+    }
+    post.title = title;
+    post.imageUrl = imageUrl;
+    post.content = content;
+    const postSaved = await post.save();
+    res.status(200).json({ post: postSaved });
+  } catch (err) {
+    catchError(err, next);
+  }
 };
 
-export const deletePost = (
+export const deletePost = async (
   req: Request,
   resp: Response,
   next: NextFunction
 ) => {
   const { postId } = req.params;
-
-  Post.findById(postId)
-    .then((post) => {
-      if (!post) {
-        throw new HttpException(404, "Could not find a post");
-      }
-      if (post.creator.toString() !== req.userId) {
-        throw new HttpException(403, "Not authorized");
-      }
-      clearImage(post.imageUrl);
-      return Post.findByIdAndRemove(postId);
-    })
-    .then(() => {
-      return User.findById(req.userId);
-    })
-    .then((user) => {
-      if (!user) {
-        throw new HttpException(401, "User not found!");
-      }
-      user.posts.pull(postId);
-      return user.save();
-    })
-    .then(() => {
-      resp.status(200).json({ success: true });
-    })
-    .catch((err) => catchError(err, next));
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      throw new HttpException(404, "Could not find a post");
+    }
+    if (post.creator.toString() !== req.userId) {
+      throw new HttpException(403, "Not authorized");
+    }
+    clearImage(post.imageUrl);
+    await Post.findByIdAndRemove(postId);
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new HttpException(401, "User not found!");
+    }
+    user.posts.pull(postId);
+    await user.save();
+    resp.status(200).json({ success: true });
+  } catch (err) {
+    catchError(err, next);
+  }
 };
