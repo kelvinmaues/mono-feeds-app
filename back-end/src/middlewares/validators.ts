@@ -29,3 +29,5 @@ export const login = [
     .normalizeEmail(),
   body("password").trim().notEmpty(),
 ];
+
+export const status = [body("status").trim().not().isEmpty()];

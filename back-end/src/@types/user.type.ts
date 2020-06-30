@@ -3,4 +3,5 @@ export type TUser = {
   password: string;
   name: string;
   posts: object[];
+  status: string;
 };
