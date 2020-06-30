@@ -10,6 +10,7 @@ router.get("/posts", isAuth, feedController.getPosts);
 
 router.post(
   "/posts",
+  isAuth,
   validators.createPost,
   errorValidator,
   feedController.createPost
@@ -19,11 +20,12 @@ router.get("/posts/:postId", feedController.getPost);
 
 router.put(
   "/posts/:postId",
+  isAuth,
   validators.createPost,
   errorValidator,
   feedController.updatePost
 );
 
-router.delete("/posts/:postId", feedController.deletePost);
+router.delete("/posts/:postId", isAuth, feedController.deletePost);
 
 export default router;
