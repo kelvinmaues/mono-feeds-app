@@ -58,7 +58,10 @@ export const createPost = async (
     }
     user.posts.push(post);
     await user.save();
-    io.getIO().emit("posts", { action: "create", post });
+    io.getIO().emit("posts", {
+      action: "create",
+      post: { ...post._doc, creator: { _id: req.userId, name: user.name } },
+    });
     res.status(201).json({ post });
   } catch (err) {
     catchError(err, next);
