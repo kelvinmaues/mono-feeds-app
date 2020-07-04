@@ -151,6 +151,7 @@ export const deletePost = async (
     }
     user.posts.pull(postId);
     await user.save();
+    io.getIO().emit("posts", { action: "delete", post: postId });
     resp.status(200).json({ success: true });
   } catch (err) {
     catchError(err, next);
