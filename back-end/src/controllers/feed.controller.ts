@@ -7,6 +7,8 @@ import HttpException from "../common/http-exception";
 import catchError from "../common/catch-error";
 // utils
 import clearImage from "../utils/clear-image";
+// connections
+import io from "../socket";
 
 export const getPosts = async (
   req: Request,
@@ -56,6 +58,7 @@ export const createPost = async (
     }
     user.posts.push(post);
     await user.save();
+    io.getIO().emit("posts", { action: "create", post });
     res.status(201).json({ post });
   } catch (err) {
     catchError(err, next);
