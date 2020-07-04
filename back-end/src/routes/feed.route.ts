@@ -8,6 +8,8 @@ const router = express.Router();
 
 router.get("/posts", isAuth, feedController.getPosts);
 
+// itemsRouter.use(checkJwt);
+
 router.post(
   "/posts",
   isAuth,

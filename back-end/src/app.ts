@@ -1,7 +1,8 @@
 /**
  * Required External Modules
  */
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
+import socketio from "socket.io";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
@@ -38,6 +39,10 @@ app.use(errorHandler);
  */
 database
   .then(() => {
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = socketio(server);
+    io.on("connection", (socket) => {
+      console.log("Client connected");
+    });
   })
   .catch((err) => console.log("Database error =>", err));
