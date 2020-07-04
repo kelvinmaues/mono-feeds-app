@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-
+import openSocket from "socket.io-client";
 import {
   Post,
   Button,
@@ -41,6 +41,11 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
+
+    /**
+     * Establish a Socket.io connection
+     */
+    openSocket("http://localhost:8080");
   }
 
   loadPosts = (direction) => {
@@ -80,25 +85,25 @@ class Feed extends Component {
       .catch(this.catchError);
   };
 
-  statusUpdateHandler = event => {
+  statusUpdateHandler = (event) => {
     event.preventDefault();
-    fetch('http://localhost:8080/auth/status', {
-      method: 'PATCH',
+    fetch("http://localhost:8080/auth/status", {
+      method: "PATCH",
       headers: {
-        Authorization: 'Bearer ' + this.props.token,
-        'Content-Type': 'application/json'
+        Authorization: "Bearer " + this.props.token,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        status: this.state.status
-      })
+        status: this.state.status,
+      }),
     })
-      .then(res => {
+      .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error("Can't update status!");
         }
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         console.log(resData);
       })
       .catch(this.catchError);
