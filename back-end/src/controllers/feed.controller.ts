@@ -107,11 +107,11 @@ export const updatePost = async (
   }
 
   try {
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate("creator");
     if (!post) {
       throw new HttpException(404, "Could not find a post");
     }
-    if (post.creator.toString() !== req.userId) {
+    if (post.creator._id.toString() !== req.userId) {
       throw new HttpException(403, "Not authorized");
     }
     if (imageUrl !== post.imageUrl) {
@@ -121,6 +121,7 @@ export const updatePost = async (
     post.imageUrl = imageUrl;
     post.content = content;
     const postSaved = await post.save();
+    io.getIO().emit("posts", { action: "update", post: postSaved });
     res.status(200).json({ post: postSaved });
   } catch (err) {
     catchError(err, next);
